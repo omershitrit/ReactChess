@@ -12,41 +12,44 @@ export default class Pawn extends React.Component {
     }
 
     calculatePossibleMoves = () => {
-        // need to filter knightInEdge cases!!!
         const possibleMoves = [];
         const tiles = this.props.getTiles();
         OFFSETS.forEach(offset => {
-            const currentLine = Math.floor(this.props.position / 8);
-            let tempPosition = this.props.position + offset;
+            //const currentLine = Math.floor(this.props.position / 8);
+            let tempPosition = this.props.position;
             while (tempPosition >= 0 && tempPosition <= 63) {
-                if (offset === 1 || offset === -1) {
-                    if (currentLine !== Math.floor(tempPosition / 8)) {
-                        break;
-                    }
-                } else {
-
-                }
-                if (tiles[tempPosition].occupied) {
-                    if (tiles[tempPosition].color !== this.props.color) {
-                        possibleMoves.push(tempPosition);
-                    }
+                if (this.isInEdge(tempPosition, offset)) {
                     break;
                 }
-                possibleMoves.push(tempPosition);
                 tempPosition += offset;
+                if (tempPosition >= 0 && tempPosition <= 63) {
+                    if (!tiles[tempPosition].occupied) {
+                        possibleMoves.push(tempPosition);
+                    } else {
+                        if (tiles[tempPosition].color !== this.props.color) {
+                            possibleMoves.push(tempPosition);
+                        }
+                        break;
+                    }
+                }
             }
         })
         return possibleMoves;
     }
 
+    isInEdge = (pos, offset) => {
+        if ((pos - 7) % 8 === 0 && offset === 1) {
+            return true;
+        }
+        if (pos % 8 === 0 && offset === -1) {
+            return true;
+        }
+        return false;
+    }
+
     handleClick = () => {
         console.log("My color is: ", this.props.color);
         this.props.highlightTiles(this.calculatePossibleMoves(), this.props.color);
-    }
-
-    isInEdge = (pos, offset, originLine) => {
-
-        return false;
     }
 
     getImage = imgPath => process.env.PUBLIC_URL + '/' + this.state.color + 'R.gif'
