@@ -16,9 +16,9 @@ export default class Board extends React.Component {
         super(props);
         this.state = {
             tiles: [],
-            whitePlayer: undefined,
+            whitePlayer: [],
             whiteDirection: -1,
-            blackPlayer: undefined,
+            blackPlayer: [],
             turn: "W",
             selectedTile: undefined,
             targetTiles: []
@@ -26,6 +26,19 @@ export default class Board extends React.Component {
     }
 
     componentDidMount = () => this.initiateBoard();
+
+    generatePiece = (description) => {
+        const { piece, color, position, firstMove } = description;
+        if (piece === "P") {
+            const direction = (color === "W" ? this.state.whiteDirection : this.state.whiteDirection * -1);
+            return <Pawn color={color} position={position} getTiles={this.getTiles} highlightTiles={this.highlightTiles} firstMove={firstMove} direction={direction} />
+        }
+        else if (piece === "B") { return <Bishop color={color} position={position} getTiles={this.getTiles} highlightTiles={this.highlightTiles} /> }
+        else if (piece === "K") { return <King color={color} position={position} getTiles={this.getTiles} highlightTiles={this.highlightTiles} firstMove={firstMove} /> }
+        else if (piece === "N") { return <Knight color={color} position={position} getTiles={this.getTiles} highlightTiles={this.highlightTiles} /> }
+        else if (piece === "Q") { return <Queen color={color} position={position} getTiles={this.getTiles} highlightTiles={this.highlightTiles} /> }
+        else if (piece === "R") { return <Rook color={color} position={position} getTiles={this.getTiles} highlightTiles={this.highlightTiles} firstMove={true} /> }
+    }
 
     generateBoard = tiles => {
         let res = [];
@@ -37,32 +50,9 @@ export default class Board extends React.Component {
         return res;
     }
 
-    generatePiece = (t) => {
-        const piece = t.piece;
-        const color = t.color;
-        const position = t.position;
-        if (color === "W") {
-            if (piece === "P") { return <Pawn color="W" position={position} getTiles={this.getTiles} highlightTiles={this.highlightTiles} firstMove={true} direction={this.state.whiteDirection} /> }
-            else if (piece === "B") { return <Bishop color="W" position={position} getTiles={this.getTiles} highlightTiles={this.highlightTiles} /> }
-            else if (piece === "K") { return <King color="W" position={position} getTiles={this.getTiles} highlightTiles={this.highlightTiles} /> }
-            else if (piece === "N") { return <Knight color="W" position={position} getTiles={this.getTiles} highlightTiles={this.highlightTiles} /> }
-            else if (piece === "Q") { return <Queen color="W" position={position} getTiles={this.getTiles} highlightTiles={this.highlightTiles} /> }
-            else if (piece === "R") { return <Rook color="W" position={position} getTiles={this.getTiles} highlightTiles={this.highlightTiles} firstMove={true} /> }
-        } else {
-            if (piece === "P") { return <Pawn color="B" position={position} getTiles={this.getTiles} highlightTiles={this.highlightTiles} firstMove={true} direction={this.state.whiteDirection * -1} /> }
-            else if (piece === "B") { return <Bishop color="B" position={position} getTiles={this.getTiles} highlightTiles={this.highlightTiles} /> }
-            else if (piece === "K") { return <King color="B" position={position} getTiles={this.getTiles} highlightTiles={this.highlightTiles} /> }
-            else if (piece === "N") { return <Knight color="B" position={position} getTiles={this.getTiles} highlightTiles={this.highlightTiles} /> }
-            else if (piece === "Q") { return <Queen color="B" position={position} getTiles={this.getTiles} highlightTiles={this.highlightTiles} /> }
-            else if (piece === "R") { return <Rook color="B" position={position} getTiles={this.getTiles} highlightTiles={this.highlightTiles} firstMove={true} /> }
-        }
-    }
-
-    generateTile = (t) => <Tile index={t.position} row={t.row} piece={this.generatePiece(t)} highlight={t.highlight} tileClicked={this.tileClicked} />
+    //generateTile = (t) => <Tile index={t.position} row={t.row} piece={createPiece(t)} highlight={t.highlight} tileClicked={this.tileClicked} />
 
     highlightTiles = (positions, color) => {
-        console.log("this.state.turn: ", this.state.turn);
-        console.log("color: ", color);
         if (this.state.turn === color) {
             let arr = this.state.tiles;
             positions.forEach(pos => arr[pos].highlight = !arr[pos].highlight);
@@ -73,18 +63,25 @@ export default class Board extends React.Component {
     tileClicked = (index) => {
         this.state.targetTiles.some(t => t === index) && this.executeMove(this.state.selectedTile, index);
         this.setState({ selectedTile: index });
-
     }
 
     executeMove = (src, dst) => {
         let tiles = this.state.tiles;
         this.setState({ tiles: [] }, () => {
+            if (tiles[dst].occupied) {
+                alert("An " + tiles[dst].piece + " is eaten!")
+                // add some bars in the sides showing the eaten pieces
+            }
             tiles[dst].piece = tiles[src].piece;
             tiles[dst].occupied = true;
             tiles[dst].highlight = false;
             tiles[dst].color = this.state.turn;
             tiles[src].occupied = false;
             tiles[src].piece = undefined;
+            // setting the firstMove flag to false so they wont be able to castle (Rook & King) or move major stepd (Pawn)
+            if (tiles[dst].piece === "P" || tiles[dst].piece === "R" || tiles[dst].piece === "K") {
+                tiles[dst].firstMove = false;
+            }
             this.state.targetTiles.forEach(pos => tiles[pos].highlight = false);
             this.setState({ tiles: tiles, selectedTile: undefined, targetTiles: [], turn: this.state.turn === "W" ? "B" : "W" })
         });
@@ -103,14 +100,14 @@ export default class Board extends React.Component {
         arr.push({ position: index++, row: 0, occupied: true, piece: "N", color: "B", highlight: false });
         arr.push({ position: index++, row: 0, occupied: true, piece: "R", color: "B", highlight: false });
 
-        arr.push({ position: index++, row: 1, occupied: true, piece: "P", color: "B", highlight: false });
-        arr.push({ position: index++, row: 1, occupied: true, piece: "P", color: "B", highlight: false });
-        arr.push({ position: index++, row: 1, occupied: true, piece: "P", color: "B", highlight: false });
-        arr.push({ position: index++, row: 1, occupied: true, piece: "P", color: "B", highlight: false });
-        arr.push({ position: index++, row: 1, occupied: true, piece: "P", color: "B", highlight: false });
-        arr.push({ position: index++, row: 1, occupied: true, piece: "P", color: "B", highlight: false });
-        arr.push({ position: index++, row: 1, occupied: true, piece: "P", color: "B", highlight: false });
-        arr.push({ position: index++, row: 1, occupied: true, piece: "P", color: "B", highlight: false });
+        arr.push({ position: index++, row: 1, occupied: true, piece: "P", color: "B", highlight: false, firstMove: true });
+        arr.push({ position: index++, row: 1, occupied: true, piece: "P", color: "B", highlight: false, firstMove: true });
+        arr.push({ position: index++, row: 1, occupied: true, piece: "P", color: "B", highlight: false, firstMove: true });
+        arr.push({ position: index++, row: 1, occupied: true, piece: "P", color: "B", highlight: false, firstMove: true });
+        arr.push({ position: index++, row: 1, occupied: true, piece: "P", color: "B", highlight: false, firstMove: true });
+        arr.push({ position: index++, row: 1, occupied: true, piece: "P", color: "B", highlight: false, firstMove: true });
+        arr.push({ position: index++, row: 1, occupied: true, piece: "P", color: "B", highlight: false, firstMove: true });
+        arr.push({ position: index++, row: 1, occupied: true, piece: "P", color: "B", highlight: false, firstMove: true });
 
         // fill in empty tiles
         for (; index < NUM_TILES - 16; ++index) {
@@ -118,14 +115,14 @@ export default class Board extends React.Component {
             arr.push({ position: index, row: Math.floor(index / 8), occupied: false, piece: undefined, color: undefined });
         }
 
-        arr.push({ position: index++, row: 6, occupied: true, piece: "P", color: "W", highlight: false });
-        arr.push({ position: index++, row: 6, occupied: true, piece: "P", color: "W", highlight: false });
-        arr.push({ position: index++, row: 6, occupied: true, piece: "P", color: "W", highlight: false });
-        arr.push({ position: index++, row: 6, occupied: true, piece: "P", color: "W", highlight: false });
-        arr.push({ position: index++, row: 6, occupied: true, piece: "P", color: "W", highlight: false });
-        arr.push({ position: index++, row: 6, occupied: true, piece: "P", color: "W", highlight: false });
-        arr.push({ position: index++, row: 6, occupied: true, piece: "P", color: "W", highlight: false });
-        arr.push({ position: index++, row: 6, occupied: true, piece: "P", color: "W", highlight: false });
+        arr.push({ position: index++, row: 6, occupied: true, piece: "P", color: "W", highlight: false, firstMove: true });
+        arr.push({ position: index++, row: 6, occupied: true, piece: "P", color: "W", highlight: false, firstMove: true });
+        arr.push({ position: index++, row: 6, occupied: true, piece: "P", color: "W", highlight: false, firstMove: true });
+        arr.push({ position: index++, row: 6, occupied: true, piece: "P", color: "W", highlight: false, firstMove: true });
+        arr.push({ position: index++, row: 6, occupied: true, piece: "P", color: "W", highlight: false, firstMove: true });
+        arr.push({ position: index++, row: 6, occupied: true, piece: "P", color: "W", highlight: false, firstMove: true });
+        arr.push({ position: index++, row: 6, occupied: true, piece: "P", color: "W", highlight: false, firstMove: true });
+        arr.push({ position: index++, row: 6, occupied: true, piece: "P", color: "W", highlight: false, firstMove: true });
 
         arr.push({ position: index++, row: 7, occupied: true, piece: "R", color: "W", highlight: false });
         arr.push({ position: index++, row: 7, occupied: true, piece: "N", color: "W", highlight: false });
@@ -139,7 +136,7 @@ export default class Board extends React.Component {
     }
 
     showTiles = () => {
-        const temp = this.state.tiles.map((t, key) => <Tile key={key} index={t.position} row={t.row} piece={this.generatePiece(t)} highlight={t.highlight} tileClicked={this.tileClicked} />);
+        const temp = this.state.tiles.map((t, key) => <Tile key={key} index={t.position} row={t.row} piece={this.generatePiece(t, this.getTiles, this.highlightTiles)} highlight={t.highlight} tileClicked={this.tileClicked} />);
         return this.generateBoard(temp).map((row, index) => <div key={index} className="row">{row}</div>)
     }
 

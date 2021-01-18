@@ -27,6 +27,6 @@ export default class Pawn extends React.Component {
     getImage = imgPath => process.env.PUBLIC_URL + '/' + this.state.color + 'N.gif'
 
     render() {
-        return <img src={this.getImage()} onClick={this.handleClick} />
+        return <img src={this.getImage()} alt="KNIGHT" onClick={this.handleClick} />
     }
 }
