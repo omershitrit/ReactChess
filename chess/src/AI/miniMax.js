@@ -12,8 +12,8 @@ const executeAIMove = getTiles => {
     const highestValue = 10000;
     const lowestValue = -10000;
     let res = -1;
-    const possibleMoves = tiles
-    console.log("possibleMoves: ", possibleMoves);
+    const possibleMoves = tiles.map(t => t.piece !== undefined ? t.piece : undefined);
+    console.log("possibleMoves: ");
 }
 
 export default executeAIMove;

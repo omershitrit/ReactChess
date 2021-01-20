@@ -39,7 +39,7 @@ export default class Pawn extends React.Component {
                 possibleMoves.push(tempPosition);
             }
         })
-        return possibleMoves.filter(pos => pos >= 0 && pos <= 63);;
+        return possibleMoves.filter(pos => pos >= 0 && pos <= 63);
     }
 
     isInEdge = (pos, offset) => {

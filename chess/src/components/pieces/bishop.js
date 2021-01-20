@@ -2,7 +2,7 @@ import React from 'react';
 
 const OFFSETS = [-9, -7, 7, 9];
 
-export default class Pawn extends React.Component {
+export default class Bishop extends React.Component {
 
     constructor(props) {
         super(props);
@@ -12,13 +12,12 @@ export default class Pawn extends React.Component {
         };
     }
 
-    getImage = imgPath => process.env.PUBLIC_URL + '/' + this.state.color + 'B.gif'
+    getImage = () => process.env.PUBLIC_URL + '/' + this.state.color + 'B.gif'
 
     calculatePossibleMoves = () => {
         const possibleMoves = [];
         const tiles = this.props.getTiles();
         OFFSETS.forEach(offset => {
-            const currentLine = Math.floor(this.props.position / 8);
             let tempPosition = this.props.position;
             while (tempPosition >= 0 && tempPosition <= 63) {
                 if (this.isInEdge(tempPosition, offset)) {
@@ -27,11 +26,9 @@ export default class Pawn extends React.Component {
                 tempPosition += offset;
                 if (tempPosition >= 0 && tempPosition <= 63) {
                     if (!tiles[tempPosition].occupied) {
-                        console.log("added: " + tempPosition + " with: " + offset)
                         possibleMoves.push(tempPosition);
                     } else {
                         if (tiles[tempPosition].color !== this.props.color) {
-                            console.log("added: " + tempPosition + " with: " + offset)
                             possibleMoves.push(tempPosition);
                         }
                         break;
@@ -39,17 +36,14 @@ export default class Pawn extends React.Component {
                 }
             }
         })
-        console.log(possibleMoves)
         return possibleMoves;
     }
 
     isInEdge = (pos, offset) => {
-        console.log("isInEdge: pos: " + pos + "offset: " + offset)
         if (pos % 8 === 0 && (offset === -9 || offset === 7)) {
             return true;
         }
         if ((pos - 7) % 8 === 0 && (offset === -7 || offset === 9)) {
-            console.log("mo here!")
             return true;
         }
         return false;

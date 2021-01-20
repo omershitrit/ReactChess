@@ -13,6 +13,8 @@ export default class Tile extends React.Component {
         };
     }
 
+    //isOccupied = () => this.state.piece === undefined ? true : false;
+
     componentDidMount = () => {
         if (this.state.piece !== undefined) {
             this.setState({ occupied: true });

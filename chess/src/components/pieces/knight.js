@@ -2,7 +2,7 @@ import React from 'react';
 
 const OFFSETS = [-17, -15, -10, -6, 6, 10, 15, 17];
 
-export default class Pawn extends React.Component {
+export default class Knight extends React.Component {
 
     constructor(props) {
         super(props);

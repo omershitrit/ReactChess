@@ -2,7 +2,7 @@ import React from 'react';
 
 const OFFSETS = [-9, -8, -7, -1, 1, 7, 8, 9];
 
-export default class Pawn extends React.Component {
+export default class King extends React.Component {
 
     constructor(props) {
         super(props);
@@ -51,6 +51,6 @@ export default class Pawn extends React.Component {
     getImage = imgPath => process.env.PUBLIC_URL + '/' + this.state.color + 'K.gif'
 
     render() {
-        return <img src={this.getImage()} onClick={this.handleClick} />
+        return <img src={this.getImage()} alt="KING" onClick={this.handleClick} />
     }
 }
