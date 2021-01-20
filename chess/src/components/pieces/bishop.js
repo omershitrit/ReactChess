@@ -39,6 +39,7 @@ export default class Pawn extends React.Component {
                 }
             }
         })
+        console.log(possibleMoves)
         return possibleMoves;
     }
 
@@ -54,9 +55,7 @@ export default class Pawn extends React.Component {
         return false;
     }
 
-    handleClick = () => {
-        this.props.highlightTiles(this.calculatePossibleMoves(), this.props.color);
-    }
+    handleClick = () => this.props.highlightTiles(this.calculatePossibleMoves(), this.props.color);
 
     render() {
         return <img src={this.getImage()} alt="BISHOP" onClick={this.handleClick} />

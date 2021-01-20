@@ -14,21 +14,17 @@ export default class Pawn extends React.Component {
         };
     }
 
-    isTileValid = i => i >= 0 && i < 64;
-
-    handleClick = () => {
-        this.props.highlightTiles(this.calculatePossibleMoves(), this.props.color);
-    }
+    handleClick = () => this.props.highlightTiles(this.calculatePossibleMoves(), this.props.color);
 
     calculatePossibleMoves = () => {
         let possibleOffsets = [];
         let possibleMoves = [];
         const tiles = this.props.getTiles();
         OFFSETS.forEach(offset => {
-            if (offset === 16 && this.props.firstMove) {
+            const dst = this.props.position + this.props.direction * offset;
+            if (offset === 16 && this.props.firstMove && !tiles[dst].occupied) {
                 possibleOffsets.push(offset);
             } else if (offset === 7 || offset === 9) {
-                const dst = this.props.position + this.props.direction * offset;
                 if (tiles[dst].occupied && tiles[dst].color !== this.props.color) {
                     possibleOffsets.push(offset);
                 }
@@ -46,7 +42,7 @@ export default class Pawn extends React.Component {
         return possibleMoves.filter(pos => pos >= 0 && pos <= 63);;
     }
 
-    getImage = imgPath => process.env.PUBLIC_URL + '/' + this.state.color + 'P.gif'
+    getImage = () => process.env.PUBLIC_URL + '/' + this.state.color + 'P.gif'
 
     render() {
         return <img src={this.getImage()} alt="PAWN" onClick={this.handleClick} />

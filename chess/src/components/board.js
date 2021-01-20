@@ -55,21 +55,31 @@ export default class Board extends React.Component {
     highlightTiles = (positions, color) => {
         if (this.state.turn === color) {
             let arr = this.state.tiles;
+            this.state.targetTiles.forEach(pos => arr[pos].highlight = false);
             positions.forEach(pos => arr[pos].highlight = !arr[pos].highlight);
             this.setState({ tiles: arr, targetTiles: positions });
         }
     }
 
     tileClicked = (index) => {
-        this.state.targetTiles.some(t => t === index) && this.executeMove(this.state.selectedTile, index);
-        this.setState({ selectedTile: index });
+        if (this.state.tiles[index].color !== undefined && this.state.tiles[index].color !== this.state.turn) {
+            // used for avoiding a color change bug
+        } else {
+            this.state.targetTiles.some(t => t === index) && this.executeMove(this.state.selectedTile, index);
+            this.setState({ selectedTile: index });
+        }
     }
 
     executeMove = (src, dst) => {
         let tiles = this.state.tiles;
+        console.log("executing! ...")
         this.setState({ tiles: [] }, () => {
             if (tiles[dst].occupied) {
-                alert("An " + tiles[dst].piece + " is eaten!")
+                if (tiles[dst].piece === "K") {
+                    const color = tiles[dst].piece.color === "W" ? "Black" : "White";
+                    alert(color + " wins!")
+                }
+
                 // add some bars in the sides showing the eaten pieces
             }
             tiles[dst].piece = tiles[src].piece;

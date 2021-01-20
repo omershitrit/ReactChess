@@ -47,10 +47,7 @@ export default class Pawn extends React.Component {
         return false;
     }
 
-    handleClick = () => {
-        console.log("My color is: ", this.props.color);
-        this.props.highlightTiles(this.calculatePossibleMoves(), this.props.color);
-    }
+    handleClick = () => this.props.highlightTiles(this.calculatePossibleMoves(), this.props.color);
 
     getImage = imgPath => process.env.PUBLIC_URL + '/' + this.state.color + 'R.gif'
 

@@ -12,17 +12,46 @@ export default class Pawn extends React.Component {
     }
 
     calculatePossibleMoves = () => {
-        // need to filter knightInEdge cases!!!
-        const positions = OFFSETS.map(offset => this.props.position + offset).filter(pos => pos >= 0 && pos <= 63)
+        const possibleMoves = [];
         const tiles = this.props.getTiles();
-        const possibleMoves = positions.filter(pos => !tiles[pos].occupied);
+        OFFSETS.forEach(offset => {
+            let tempPosition = this.props.position;
+            if (!this.isInEdge(tempPosition, offset)) {
+                tempPosition += offset;
+                if (tempPosition >= 0 && tempPosition <= 63) {
+                    if (!tiles[tempPosition].occupied) {
+                        console.log("added: " + tempPosition + " with offset: " + offset)
+                        possibleMoves.push(tempPosition);
+                    } else {
+                        if (tiles[tempPosition].color !== this.props.color) {
+                            console.log("added: " + tempPosition + " with offset: " + offset)
+                            possibleMoves.push(tempPosition);
+                        }
+                    }
+                }
+            }
+        })
         return possibleMoves;
     }
 
-    handleClick = () => {
-        console.log("My color is: ", this.props.color);
-        this.props.highlightTiles(this.calculatePossibleMoves(), this.props.color);
+    isInEdge = (pos, offset) => {
+        if (pos % 8 === 0 && (offset === -17 || offset === -10
+            || offset === 6 || offset === 15)) {
+            return true;
+        }
+        if ((pos - 1) % 8 === 0 && (offset === -10 || offset === 10 || offset === 6)) {
+            return true;
+        }
+        if ((pos - 6) % 8 === 0 && (offset === -6 || offset === 10)) {
+            return true;
+        }
+        if ((pos - 7) % 8 === 0 && (offset === -15 || offset === -6 || offset === 10 || offset === 17)) {
+            return true;
+        }
+        return false;
     }
+
+    handleClick = () => this.props.highlightTiles(this.calculatePossibleMoves(), this.props.color);
 
     getImage = imgPath => process.env.PUBLIC_URL + '/' + this.state.color + 'N.gif'
 
