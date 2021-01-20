@@ -6,6 +6,7 @@ import Knight from './pieces/knight.js';
 import Bishop from './pieces/bishop.js';
 import King from './pieces/king.js';
 import Queen from './pieces/queen.js';
+import executeAIMove from '../AI/miniMax.js';
 import './board.css';
 
 const NUM_TILES = 64;
@@ -16,9 +17,9 @@ export default class Board extends React.Component {
         super(props);
         this.state = {
             tiles: [],
-            whitePlayer: [],
+            whitePlayer: "player",
             whiteDirection: -1,
-            blackPlayer: [],
+            blackPlayer: props.mode,
             turn: "W",
             selectedTile: undefined,
             targetTiles: []
@@ -26,6 +27,10 @@ export default class Board extends React.Component {
     }
 
     componentDidMount = () => this.initiateBoard();
+
+    componentDidUpdate = () => {
+        this.state.blackPlayer === "computer" && this.state.turn === "B" && executeAIMove(this.getTiles);
+    }
 
     generatePiece = (description) => {
         const { piece, color, position, firstMove } = description;
@@ -62,17 +67,12 @@ export default class Board extends React.Component {
     }
 
     tileClicked = (index) => {
-        if (this.state.tiles[index].color !== undefined && this.state.tiles[index].color !== this.state.turn) {
-            // used for avoiding a color change bug
-        } else {
-            this.state.targetTiles.some(t => t === index) && this.executeMove(this.state.selectedTile, index);
-            this.setState({ selectedTile: index });
-        }
+        this.state.targetTiles.some(t => t === index) && this.executeMove(this.state.selectedTile, index);
+        this.setState({ selectedTile: index });
     }
 
     executeMove = (src, dst) => {
         let tiles = this.state.tiles;
-        console.log("executing! ...")
         this.setState({ tiles: [] }, () => {
             if (tiles[dst].occupied) {
                 if (tiles[dst].piece === "K") {
@@ -146,7 +146,7 @@ export default class Board extends React.Component {
     }
 
     showTiles = () => {
-        const temp = this.state.tiles.map((t, key) => <Tile key={key} index={t.position} row={t.row} piece={this.generatePiece(t, this.getTiles, this.highlightTiles)} highlight={t.highlight} tileClicked={this.tileClicked} />);
+        const temp = this.state.tiles.map((t, key) => <Tile key={key} index={t.position} row={t.row} piece={this.generatePiece(t)} highlight={t.highlight} tileClicked={this.tileClicked} />);
         return this.generateBoard(temp).map((row, index) => <div key={index} className="row">{row}</div>)
     }
 

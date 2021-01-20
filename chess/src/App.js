@@ -1,6 +1,6 @@
 import React from 'react';
 import './App.css';
-import WelcomePage from './components/welcomePage.js';
+import HomePage from './components/homePage.js';
 import Board from './components/board.js';
 
 export default class App extends React.Component {
@@ -8,14 +8,19 @@ export default class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      diffifulty: 0
+      difficulty: 2,
+      showBoard: false,
+      mode: "computer"
     };
   }
+
+  showBoard = (mode) => this.setState({ showBoard: true, mode: mode })
 
   render() {
     return (
       <div className="center">
-        <Board />
+        <HomePage showBoard={this.showBoard} />
+        {this.state.showBoard && <Board mode={this.state.mode} difficulty={this.state.difficulty} />}
       </div>
     );
   }
