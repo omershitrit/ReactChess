@@ -16,7 +16,7 @@ const calculateMultipleSteps = (OFFSETS, position, tiles) => {
             }
             tempPosition += offset;
             if (tempPosition >= 0 && tempPosition <= 63) {
-                if (!tiles[tempPosition].occupied) {
+                if (tiles[tempPosition].piece === undefined) {
                     possibleMoves.push(tempPosition);
                 } else {
                     if (tiles[tempPosition].color !== tiles[position].color) {
@@ -37,7 +37,7 @@ const calculateOneStep = (OFFSETS, position, tiles) => {
         if (!isPieceInEdge(tempPosition, offset, tiles[position].piece)) {
             tempPosition += offset;
             if (tempPosition >= 0 && tempPosition <= 63) {
-                if (!tiles[tempPosition].occupied) {
+                if (!tiles[tempPosition].piece !== undefined) {
                     possibleMoves.push(tempPosition);
                 } else {
                     if (tiles[tempPosition].color !== tiles[position].color) {
@@ -67,17 +67,19 @@ const calculatePawnMoves = (src, tiles, direction) => {
     let possibleMoves = [];
     PAWN_OFFSETS.forEach(offset => {
         const dst = src + direction * offset;
-        if (offset === 16 && tiles[src].firstMove && !tiles[dst].occupied && !tiles[dst - direction * 8].occupied) {
-            possibleMoves.push(dst);
-        } else if (offset === 7 || offset === 9) {
-            if (tiles[dst].occupied && tiles[dst].color !== tiles[src].color && !isPawnInEdge(src, offset)) {
+        if (dst >= 0 && dst <= 63) {
+            if (offset === 16 && tiles[src].firstMove && tiles[dst].piece === undefined && !tiles[dst - direction * 8].piece !== undefined) {
+                possibleMoves.push(dst);
+            } else if (offset === 7 || offset === 9) {
+                if (tiles[dst].piece !== undefined && tiles[dst].color !== tiles[src].color && !isPawnInEdge(src, offset)) {
+                    possibleMoves.push(dst);
+                }
+            } else if (offset === 8 && tiles[dst].piece === undefined) {
                 possibleMoves.push(dst);
             }
-        } else if (offset === 8 && !tiles[dst].occupied) {
-            possibleMoves.push(dst);
         }
     });
-    return possibleMoves.filter(pos => pos >= 0 && pos <= 63);
+    return possibleMoves;
 }
 
 // a function for Bishop, Rook, Queen

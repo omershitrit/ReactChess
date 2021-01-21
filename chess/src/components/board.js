@@ -27,7 +27,8 @@ export default class Board extends React.Component {
     componentDidUpdate = () => {
         if (this.state.blackPlayer === "computer" && this.state.turn === "B") {
             const { src, dst } = executeAIMove(this.state.tiles, this.props.difficulty);
-            src !== -1 && dst !== -1 && this.executeMove(src, dst)
+            console.log("Move from: " + src + " to: " + dst)
+            //src !== -1 && dst !== -1 && this.executeMove(src, dst)
         }
     }
 
@@ -50,15 +51,13 @@ export default class Board extends React.Component {
 
     tileClicked = (index) => {
         const tiles = this.state.tiles;
-        // show possible moves for the clicked piece:
         if (this.state.turn === tiles[index].color) {
             const possibleMoves = calculatePossibleMoves(index, tiles)
-            //console.log("possibleMoves: ", possibleMoves)
             this.highlightTiles(possibleMoves)
-        } else {
-            this.state.targetTiles.some(t => t === index) && this.executeMove(this.state.selectedTile, index);
+            this.setState({ selectedTile: index });
+        } else if (this.state.targetTiles.some(t => t === index)) {
+            this.executeMove(this.state.selectedTile, index);
         }
-        this.setState({ selectedTile: index });
     }
 
     executeMove = (src, dst) => {
@@ -76,10 +75,8 @@ export default class Board extends React.Component {
                 console.log(this.convertToPoint(tiles[dst].piece));
             }
             tiles[dst].piece = tiles[src].piece;
-            tiles[dst].occupied = true;
             tiles[dst].highlight = false;
             tiles[dst].color = this.state.turn;
-            tiles[src].occupied = false;
             tiles[src].piece = undefined;
             tiles[src].color = undefined;
             // setting the firstMove flag to false so they wont be able to castle (Rook & King) or move major stepd (Pawn)
@@ -110,46 +107,46 @@ export default class Board extends React.Component {
 
     initiateBoard = () => {
         let arr = [];
-        arr.push({ piece: "R", color: "B", occupied: true, highlight: false, firstMove: true });
-        arr.push({ piece: "N", color: "B", occupied: true, highlight: false });
-        arr.push({ piece: "B", color: "B", occupied: true, highlight: false });
-        arr.push({ piece: "Q", color: "B", occupied: true, highlight: false });
-        arr.push({ piece: "K", color: "B", occupied: true, highlight: false, firstMove: true });
-        arr.push({ piece: "B", color: "B", occupied: true, highlight: false });
-        arr.push({ piece: "N", color: "B", occupied: true, highlight: false });
-        arr.push({ piece: "R", color: "B", occupied: true, highlight: false, firstMove: true });
+        arr.push({ piece: "R", color: "B", highlight: false, firstMove: true });
+        arr.push({ piece: "N", color: "B", highlight: false });
+        arr.push({ piece: "B", color: "B", highlight: false });
+        arr.push({ piece: "Q", color: "B", highlight: false });
+        arr.push({ piece: "K", color: "B", highlight: false, firstMove: true });
+        arr.push({ piece: "B", color: "B", highlight: false });
+        arr.push({ piece: "N", color: "B", highlight: false });
+        arr.push({ piece: "R", color: "B", highlight: false, firstMove: true });
 
-        arr.push({ piece: "P", color: "B", occupied: true, highlight: false, firstMove: true });
-        arr.push({ piece: "P", color: "B", occupied: true, highlight: false, firstMove: true });
-        arr.push({ piece: "P", color: "B", occupied: true, highlight: false, firstMove: true });
-        arr.push({ piece: "P", color: "B", occupied: true, highlight: false, firstMove: true });
-        arr.push({ piece: "P", color: "B", occupied: true, highlight: false, firstMove: true });
-        arr.push({ piece: "P", color: "B", occupied: true, highlight: false, firstMove: true });
-        arr.push({ piece: "P", color: "B", occupied: true, highlight: false, firstMove: true });
-        arr.push({ piece: "P", color: "B", occupied: true, highlight: false, firstMove: true });
+        arr.push({ piece: "P", color: "B", highlight: false, firstMove: true });
+        arr.push({ piece: "P", color: "B", highlight: false, firstMove: true });
+        arr.push({ piece: "P", color: "B", highlight: false, firstMove: true });
+        arr.push({ piece: "P", color: "B", highlight: false, firstMove: true });
+        arr.push({ piece: "P", color: "B", highlight: false, firstMove: true });
+        arr.push({ piece: "P", color: "B", highlight: false, firstMove: true });
+        arr.push({ piece: "P", color: "B", highlight: false, firstMove: true });
+        arr.push({ piece: "P", color: "B", highlight: false, firstMove: true });
 
         // fill in empty tiles
         for (let i = 0; i < 32; ++i) {
             arr.push({ piece: undefined, color: undefined, occupied: false, });
         }
 
-        arr.push({ piece: "P", color: "W", occupied: true, highlight: false, firstMove: true });
-        arr.push({ piece: "P", color: "W", occupied: true, highlight: false, firstMove: true });
-        arr.push({ piece: "P", color: "W", occupied: true, highlight: false, firstMove: true });
-        arr.push({ piece: "P", color: "W", occupied: true, highlight: false, firstMove: true });
-        arr.push({ piece: "P", color: "W", occupied: true, highlight: false, firstMove: true });
-        arr.push({ piece: "P", color: "W", occupied: true, highlight: false, firstMove: true });
-        arr.push({ piece: "P", color: "W", occupied: true, highlight: false, firstMove: true });
-        arr.push({ piece: "P", color: "W", occupied: true, highlight: false, firstMove: true });
+        arr.push({ piece: "P", color: "W", highlight: false, firstMove: true });
+        arr.push({ piece: "P", color: "W", highlight: false, firstMove: true });
+        arr.push({ piece: "P", color: "W", highlight: false, firstMove: true });
+        arr.push({ piece: "P", color: "W", highlight: false, firstMove: true });
+        arr.push({ piece: "P", color: "W", highlight: false, firstMove: true });
+        arr.push({ piece: "P", color: "W", highlight: false, firstMove: true });
+        arr.push({ piece: "P", color: "W", highlight: false, firstMove: true });
+        arr.push({ piece: "P", color: "W", highlight: false, firstMove: true });
 
-        arr.push({ piece: "R", color: "W", occupied: true, highlight: false, firstMove: true });
-        arr.push({ piece: "N", color: "W", occupied: true, highlight: false });
-        arr.push({ piece: "B", color: "W", occupied: true, highlight: false });
-        arr.push({ piece: "Q", color: "W", occupied: true, highlight: false });
-        arr.push({ piece: "K", color: "W", occupied: true, highlight: false, firstMove: true });
-        arr.push({ piece: "B", color: "W", occupied: true, highlight: false });
-        arr.push({ piece: "N", color: "W", occupied: true, highlight: false });
-        arr.push({ piece: "R", color: "W", occupied: true, highlight: false, firstMove: true });
+        arr.push({ piece: "R", color: "W", highlight: false, firstMove: true });
+        arr.push({ piece: "N", color: "W", highlight: false });
+        arr.push({ piece: "B", color: "W", highlight: false });
+        arr.push({ piece: "Q", color: "W", highlight: false });
+        arr.push({ piece: "K", color: "W", highlight: false, firstMove: true });
+        arr.push({ piece: "B", color: "W", highlight: false });
+        arr.push({ piece: "N", color: "W", highlight: false });
+        arr.push({ piece: "R", color: "W", highlight: false, firstMove: true });
         this.setState({ tiles: arr });
     }
 
