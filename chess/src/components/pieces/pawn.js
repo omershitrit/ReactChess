@@ -22,10 +22,10 @@ export default class Pawn extends React.Component {
         const tiles = this.props.getTiles();
         OFFSETS.forEach(offset => {
             const dst = this.props.position + this.props.direction * offset;
-            if (offset === 16 && this.props.firstMove && !tiles[dst].occupied && !tiles[dst - this.props.direction * 8].occupied) {
+            if (offset === 16 && this.props.firstMove && !tiles[dst].occupied && !tiles[dst + this.props.direction * 8].occupied) {
                 possibleOffsets.push(offset);
             } else if (offset === 7 || offset === 9) {
-                if (tiles[dst].occupied && tiles[dst].color !== this.props.color) {
+                if (tiles[dst].occupied && tiles[dst].color !== this.props.color && !this.isPawnInEdge(this.props.position, offset)) {
                     possibleOffsets.push(offset);
                 }
             } else if (offset === 8) {
@@ -42,7 +42,7 @@ export default class Pawn extends React.Component {
         return possibleMoves.filter(pos => pos >= 0 && pos <= 63);
     }
 
-    isInEdge = (pos, offset) => {
+    isPawnInEdge = (pos, offset) => {
         if (pos % 8 === 0 && offset === 7) {
             return true;
         }

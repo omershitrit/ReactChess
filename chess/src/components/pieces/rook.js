@@ -9,6 +9,7 @@ export default class Rook extends React.Component {
         this.state = {
             color: props.color
         };
+        props.calculat && props.calculateMoves(this.calculatePossibleMoves());
     }
 
     calculatePossibleMoves = () => {

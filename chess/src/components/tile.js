@@ -31,13 +31,12 @@ export default class Tile extends React.Component {
             // be ready to preform a move
         }
         this.props.tileClicked(this.state.index);
-
     }
 
     render() {
         return (
-            <div className={this.getColor()} onClick={this.handleClick}>
-                {this.state.piece}
+            <div className={this.getColor()} onClick={this.handleClick}>{this.props.index}
+                {this.props.piece != undefined && <img src={process.env.PUBLIC_URL + '/' + this.props.color + this.props.piece + '.gif'} alt="PIECE" />}
                 {this.props.highlight && <img src={process.env.PUBLIC_URL + '/possibleMoveGif.gif'} alt="HIGHLIGHT" />}
             </div>
         );

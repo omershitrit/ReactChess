@@ -16,11 +16,16 @@ export default class App extends React.Component {
 
   showBoard = (mode) => this.setState({ showBoard: true, mode: mode })
 
+  resetBoard = () => this.setState({ showBoard: false }, () => this.setState({ showBoard: true }))
+
   render() {
     return (
       <div className="center">
         <HomePage showBoard={this.showBoard} />
-        {this.state.showBoard && <Board mode={this.state.mode} difficulty={this.state.difficulty} />}
+        <div className="board">
+          <button className="rst-btn" onClick={this.resetBoard}>Reset Board</button>
+          {this.state.showBoard && <Board mode={this.state.mode} difficulty={this.state.difficulty} />}
+        </div>
       </div>
     );
   }
