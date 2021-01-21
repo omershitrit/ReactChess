@@ -47,36 +47,30 @@ const implementMove = (src, dst, tiles) => {
     return { tiles: tiles, value: value };//, log: src + "to: " + dst + '\n' };
 }
 
-const executeAIMove = (tiles, depth) => {
-    if (tiles.length > 0) {
-        const possibleMoves = tiles.filter(t => t.color === "B").map((t, i) => calculatePossibleMoves(i, tiles));
-        let max = -10000;
-        let i = 0;
-        let j = 0;
-        possibleMoves.forEach(moves => {
-            moves.forEach((move, src) => {
-                let res = implementMove(src, move, tiles)
-                const currentValue = res.value + min(res.tiles, depth - 1)
-                if (currentValue > max) {
-                    i = src;
-                    j = move;
-                    max = currentValue;
-                }
-            });
+const deepCopy = arr => {
+    return JSON.parse(JSON.stringify(arr))
+}
+
+const executeAIMove = (tiles2, depth) => {
+    const tiles = deepCopy(tiles2);
+    //console.log("Blacks: ", tiles.filter(t => t.color === "B"))
+    const possibleMoves = tiles.filter(t => t.color === "B").map((t, i) => calculatePossibleMoves(i, tiles));
+    let max = -10000;
+    let i = 0;
+    let j = 0;
+    possibleMoves.forEach((moves, src) => {
+        moves.forEach(move => {
+            let res = implementMove(src, move, tiles)
+            const currentValue = res.value + min(res.tiles, depth - 1)
+            if (currentValue > max) {
+                i = src;
+                j = move;
+                max = currentValue;
+            }
         });
-        return { src: i, dst: j };
-
-
-        /*
-        const randomTile = Math.floor(Math.random() * possibleMoves.length);
-        const moves = possibleMoves[randomTile]
-        const index = Math.floor(Math.random() * moves.length);
-        return { src: randomTile, dst: moves[index] };
-        */
-
-    } else {
-        return { src: -1, dst: -1 };
-    }
+    });
+    //console.log("Blacks: ", tiles.filter(t => t.color === "B"))
+    return { src: i, dst: j };
 
 }
 
@@ -86,8 +80,8 @@ const min = (tiles, depth) => {
     if (depth == 0) { return; }
     let lowestValue = 10000;
     const possibleMoves = tiles.filter(t => t.color === "B").map((t, i) => calculatePossibleMoves(i, tiles)).filter(moves => moves.length > 0);
-    possibleMoves.forEach(moves => {
-        moves.forEach((move, src) => {
+    possibleMoves.forEach((moves, src) => {
+        moves.forEach(move => {
             let { newTiles, value } = implementMove(src, move, tiles)
             const currentValue = value + max(newTiles, depth - 1);
             if (currentValue >= lowestValue) {
@@ -103,8 +97,8 @@ const max = (tiles, depth) => {
     if (depth == 0) { return; }
     let highestValue = -10000;
     const possibleMoves = tiles.filter(t => t.color === "B").map((t, i) => calculatePossibleMoves(i, tiles)).filter(moves => moves.length > 0);
-    possibleMoves.forEach(moves => {
-        moves.forEach((move, src) => {
+    possibleMoves.forEach((moves, src) => {
+        moves.forEach(move => {
             let { newTiles, value } = implementMove(src, move, tiles)
             const currentValue = value + min(newTiles, depth - 1);
             if (currentValue >= highestValue) {
