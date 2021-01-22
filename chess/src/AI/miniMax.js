@@ -22,7 +22,8 @@ const convertToPoint = piece => {
     }
 }
 
-const implementMove = (src, dst, tiles) => {
+const implementMove = (move, tiles) => {
+    const { src, dst } = move;
     let value = 0;
     if (tiles[dst].piece !== undefined && tiles[dst].color !== tiles[src].color && tiles[dst].color !== undefined) {
         console.log("can eat: " + tiles[dst].piece + " if i move from: " + src + " to: " + dst)
@@ -46,30 +47,28 @@ const deepCopy = arr => {
 }
 
 const executeAIMove = (tiles2, depth) => {
-    const tiles = deepCopy(tiles2);
+    let tiles = deepCopy(tiles2);
     let max = -10000;
-    let i = -1;
-    let j = -1;
-    tiles.forEach((t, index) => {
-        if (t.color === "B") {
-            const moves = calculatePossibleMoves(index, tiles);
-            moves.forEach(move => {
-                let res = implementMove(index, move, tiles)
-                const currentValue = res.value + min(res.tiles, depth - 1, "W")
-                if (currentValue > max) {
-                    i = index;
-                    j = move;
-                    max = currentValue;
-                    console.log("src: " + i + ", dst: " + j + " put me with: " + max)
-                }
-            });
-        }
-    });
-    let res = { src: i, dst: j };
-    if (res.src === -1 && res.dst === -1) { res = pickRandomly(tiles); }
-    return res;
-    return { src: i, dst: j };
-
+    let bestMove = {};
+    const save = deepCopy(tiles);
+    const possibleMoves = tiles.filter(t => t.color === "B").map(t => calculatePossibleMoves(t.position, tiles)).filter(moves => moves.length > 0);
+    possibleMoves.forEach(moves => {
+        moves.forEach(move => {
+            tiles = save;
+            let res = implementMove(move, tiles)
+            const currentValue = res.value + min(res.tiles, depth - 1, "W")
+            if (currentValue > max) {
+                bestMove = move;
+                max = currentValue;
+                console.log("bestMove put me with: " + max)
+            }
+        });
+    })
+    if (bestMove.src === -1 && bestMove.dst === -1) {
+        bestMove = pickRandomly(tiles);
+    } else {
+        return bestMove;
+    }
 }
 
 const pickRandomly = possibleMoves => {
@@ -83,12 +82,14 @@ const pickRandomly = possibleMoves => {
 }
 
 const min = (tiles, depth, turn) => {
-    if (depth == 0) { return evalutateBoard("B", "W", tiles); }
+    if (depth == 0) { return evalutateBoard(turn, turn === "B" ? "W" : "B", tiles); }
     let lowestValue = 10000;
+    const save = deepCopy(tiles);
     const possibleMoves = tiles.filter(t => t.color === turn).map((t, i) => calculatePossibleMoves(i, tiles)).filter(moves => moves.length > 0);
-    possibleMoves.forEach((moves, src) => {
+    possibleMoves.forEach(moves => {
         moves.forEach(move => {
-            let res = implementMove(src, move, tiles)
+            tiles = save;
+            let res = implementMove(move, tiles)
             const currentValue = res.value + max(res.tiles, depth - 1, "B");
             if (currentValue <= lowestValue) {
                 lowestValue = currentValue;
@@ -99,13 +100,14 @@ const min = (tiles, depth, turn) => {
 }
 
 const max = (tiles, depth, turn) => {
-    if (depth == 0) { return evalutateBoard("B", "W", tiles); }
+    if (depth == 0) { return evalutateBoard(turn, turn === "B" ? "W" : "B", tiles); }
     let highestValue = -10000;
+    const save = deepCopy(tiles)
     const possibleMoves = tiles.filter(t => t.color === turn).map((t, i) => calculatePossibleMoves(i, tiles))
-    console.log("possibleMobes: ", possibleMoves)
-    possibleMoves.forEach((moves, src) => {
+    possibleMoves.forEach(moves => {
         moves.forEach(move => {
-            let res = implementMove(src, move, tiles)
+            tiles = save;
+            let res = implementMove(move, tiles)
             const currentValue = res.value + min(res.tiles, depth - 1);
             if (currentValue >= highestValue) {
                 highestValue = currentValue;
@@ -117,11 +119,11 @@ const max = (tiles, depth, turn) => {
 
 const evalutateBoard = (c1, c2, tiles) => {
     return 0;
+    console.log(tiles)
     const p1 = tiles.filter(t => t.color === c1).map(t => convertToPoint(t.piece)).reduce((a, b) => a + b, 0);
     const p2 = tiles.filter(t => t.color === c2).map(t => convertToPoint(t.piece)).reduce((a, b) => a + b, 0);
-    console.log("c1: " + tiles.filter(t => t.color === c1))
-    console.log("c2: " + tiles.filter(t => t.color === c2))
-    console.log("p1: " + p1 + ", p2: " + p2)
+    console.log(p1)
+    console.log(p2)
     return p2 - p1;
 }
 

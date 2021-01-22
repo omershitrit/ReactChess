@@ -17,10 +17,10 @@ const calculateMultipleSteps = (OFFSETS, position, tiles) => {
             tempPosition += offset;
             if (tempPosition >= 0 && tempPosition <= 63) {
                 if (tiles[tempPosition].piece === undefined) {
-                    possibleMoves.push(tempPosition);
+                    possibleMoves.push({ src: position, dst: tempPosition });
                 } else {
                     if (tiles[tempPosition].color !== tiles[position].color) {
-                        possibleMoves.push(tempPosition);
+                        possibleMoves.push({ src: position, dst: tempPosition });
                     }
                     break;
                 }
@@ -38,10 +38,10 @@ const calculateOneStep = (OFFSETS, position, tiles) => {
             tempPosition += offset;
             if (tempPosition >= 0 && tempPosition <= 63) {
                 if (tiles[tempPosition].piece === undefined) {
-                    possibleMoves.push(tempPosition);
+                    possibleMoves.push({ src: position, dst: tempPosition });
                 } else {
                     if (tiles[tempPosition].color !== tiles[position].color) {
-                        possibleMoves.push(tempPosition);
+                        possibleMoves.push({ src: position, dst: tempPosition });
                     }
                 }
             }
@@ -69,13 +69,13 @@ const calculatePawnMoves = (src, tiles, direction) => {
         const dst = src + direction * offset;
         if (dst >= 0 && dst <= 63) {
             if (offset === 16 && tiles[src].firstMove && tiles[dst].piece === undefined && tiles[dst - direction * 8].piece === undefined) {
-                possibleMoves.push(dst);
+                possibleMoves.push({ src: src, dst: dst });
             } else if (offset === 7 || offset === 9) {
-                if (tiles[dst].piece !== undefined && tiles[dst].color !== tiles[src].color && !isPawnInEdge(src, offset)) {
-                    possibleMoves.push(dst);
+                if (tiles[dst].piece !== undefined && tiles[dst].color !== tiles[src].color && !isPawnInEdge(src, offset, direction)) {
+                    possibleMoves.push({ src: src, dst: dst });
                 }
             } else if (offset === 8 && tiles[dst].piece === undefined) {
-                possibleMoves.push(dst);
+                possibleMoves.push({ src: src, dst: dst });
             }
         }
     });
@@ -139,17 +139,23 @@ const isPieceInEdge = (pos, offset, piece) => {
     return false;
 }
 
-const isPawnInEdge = (pos, offset) => {
-    if (pos % 8 === 0 && offset === 9) {
-        return true;
-    }
-    if ((pos - 7) % 8 === 0 && offset === 7) {
-        return true;
+const isPawnInEdge = (pos, offset, direction) => {
+    if (direction === 1) {
+        if (pos % 8 === 0 && offset === 7) {
+            return true;
+        }
+        if ((pos - 7) % 8 === 0 && offset === 9) {
+            return true;
+        }
+    } else if (direction === -1) {
+        if (pos % 8 === 0 && offset === 9) {
+            return true
+        }
+        if ((pos - 7) % 8 === 0 && offset === 7) {
+            return true;
+        }
     }
     return false;
 }
-
-
-
 
 export default calculatePossibleMoves;
