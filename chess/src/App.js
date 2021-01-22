@@ -8,7 +8,7 @@ export default class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      difficulty: 2,
+      difficulty: 1,
       showBoard: false,
       mode: "computer"
     };

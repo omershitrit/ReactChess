@@ -64,7 +64,6 @@ const calculatePossibleMoves = (src, tiles) => {
 }
 
 const calculatePawnMoves = (src, tiles, direction) => {
-    console.log("Pawn direction: " + direction + " in color: " + tiles[src].color)
     let possibleMoves = [];
     PAWN_OFFSETS.forEach(offset => {
         const dst = src + direction * offset;

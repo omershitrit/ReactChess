@@ -45,7 +45,6 @@ export default class Board extends React.Component {
         const tiles = this.state.tiles;
         if (this.state.turn === tiles[index].color) {
             const possibleMoves = calculatePossibleMoves(index, tiles)
-            //console.log("Moves found: ", possibleMoves);
             this.highlightTiles(possibleMoves)
             this.setState({ selectedTile: index });
         } else if (this.state.targetTiles.some(t => t === index)) {
@@ -55,8 +54,6 @@ export default class Board extends React.Component {
 
     executeMove = (src, dst) => {
         let tiles = this.state.tiles;
-        //console.log("Blacks: ", this.state.tiles.filter(t => t.color === "B"))
-        //console.log("Whites: ", this.state.tiles.filter(t => t.color === "W"))
         if (tiles[dst].occupied) {
             if (tiles[dst].piece === "K") {
                 const color = tiles[dst].piece.color === "W" ? "Black" : "White";
@@ -66,35 +63,22 @@ export default class Board extends React.Component {
             // add some bars in the sides showing the eaten pieces
         }
         if (tiles[dst].piece !== undefined) {
-            //console.log(this.convertToPoint(tiles[dst].piece));
         }
-        // console.log("src: ", src)
-        // console.log("dst: ", dst)
-        // console.log("tiles[src]: ", tiles[src])
-        // console.log("tiles[dst]: ", tiles[dst])
         tiles[dst].piece = tiles[src].piece;
         tiles[dst].highlight = false;
         tiles[dst].color = this.state.turn;
         tiles[src].piece = undefined;
         tiles[src].color = undefined;
-        //console.log("tiles[src]: ", tiles[src])
-        //console.log("tiles[dst]: ", tiles[dst])
         // setting the firstMove flag to false so they wont be able to castle (Rook & King) or move major stepd (Pawn)
         if (tiles[dst].piece === "P" || tiles[dst].piece === "R" || tiles[dst].piece === "K") {
             tiles[dst].firstMove = false;
         }
-        //console.log("Blacks: ", this.state.tiles.filter(t => t.color === "B"))
-        // console.log("Whites: ", this.state.tiles.filter(t => t.color === "W"))
+
         this.state.targetTiles.forEach(pos => tiles[pos].highlight = false);
         this.setState({ tiles: tiles, selectedTile: undefined, targetTiles: [], turn: this.state.turn === "W" ? "B" : "W" }, () => {
 
             if (this.state.blackPlayer === "computer" && this.state.turn === "B" && this.state.tiles.length > 0) {
-                //console.log("Blacks: ", this.state.tiles.filter(t => t.color === "B"))
-                //console.log("Whites: ", this.state.tiles.filter(t => t.color === "W"))
-                console.log("Blacks: ", this.state.tiles.filter(t => t.color === "B"))
                 const { src, dst } = executeAIMove(this.state.tiles, this.props.difficulty);
-                console.log("Blacks: ", this.state.tiles.filter(t => t.color === "B"))
-                //console.log("Move from: " + src + " to: " + dst)
                 this.executeMove(src, dst);
 
             }
@@ -120,7 +104,6 @@ export default class Board extends React.Component {
 
     initiateBoard = () => {
         let arr = [];
-        //console.log("im here!")
         arr.push({ piece: "R", color: "B", highlight: false, firstMove: true });
         arr.push({ piece: "N", color: "B", highlight: false });
         arr.push({ piece: "B", color: "B", highlight: false });
@@ -165,7 +148,6 @@ export default class Board extends React.Component {
     }
 
     showTiles = () => {
-        //console.log("Blacks: ", this.state.tiles.filter(t => t.color === "B"))
         const tiles = this.state.tiles.map((t, i) => <Tile key={i} index={i} row={Math.floor(i / 8)} piece={t.piece} color={t.color} highlight={t.highlight} tileClicked={this.tileClicked} />);
         return this.generateBoard(tiles).map((row, index) => <div key={index} className="row">{row}</div>)
     }
